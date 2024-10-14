@@ -1,4 +1,6 @@
 import React from "react";
+
+import { ToastContext } from "../ToastProvider";
 import Button from "../Button";
 import ToastShelf from "../ToastShelf";
 
@@ -7,30 +9,18 @@ import styles from "./ToastPlayground.module.css";
 const VARIANT_OPTIONS = ["notice", "warning", "success", "error"];
 
 function ToastPlayground() {
-  const [toasts, setToasts] = React.useState([]);
+  const { createToast } = React.useContext(ToastContext);
+
   const [message, setMessage] = React.useState("");
   const [variant, setVariant] = React.useState(VARIANT_OPTIONS[0]);
 
   function handleCreateToast(event) {
     event.preventDefault();
-    const nextToasts = [
-      ...toasts,
-      {
-        id: crypto.randomUUID(),
-        message,
-        variant,
-      },
-    ];
-    setToasts(nextToasts);
+
+    createToast(message, variant);
+
     setMessage("");
     setVariant(VARIANT_OPTIONS[0]);
-  }
-
-  function handleDismiss(id) {
-    const nextToasts = toasts.filter((toast) => {
-      return toast.id !== id;
-    });
-    setToasts(nextToasts);
   }
 
   return (
@@ -40,7 +30,7 @@ function ToastPlayground() {
         <h1>Toast Playground</h1>
       </header>
 
-      <ToastShelf toasts={toasts} handleDismiss={handleDismiss} />
+      <ToastShelf />
 
       <form className={styles.controlsWrapper} onSubmit={handleCreateToast}>
         <div className={styles.row}>
@@ -68,14 +58,15 @@ function ToastPlayground() {
           <div className={`${styles.inputWrapper} ${styles.radioWrapper}`}>
             {VARIANT_OPTIONS.map((option) => {
               const id = `variant-${option}`;
+
               return (
-                <label htmlFor={id} key={id}>
+                <label key={id} htmlFor={id}>
                   <input
+                    id={id}
                     type="radio"
                     name="variant"
-                    id={id}
                     value={option}
-                    checked={variant === option}
+                    checked={option === variant}
                     onChange={(event) => {
                       setVariant(event.target.value);
                     }}

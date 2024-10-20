@@ -30,10 +30,27 @@ function ToastProvider({ children }) {
     });
     setToasts(nextToasts);
   }
+
+  React.useEffect(() => {
+    function handleKeyDown(event) {
+      if (event.code === "Escape") {
+        const nextToasts = [];
+        setToasts(nextToasts);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
     <ToastContext.Provider value={{ toasts, createToast, dismissToast }}>
       {children}
     </ToastContext.Provider>
   );
 }
+
 export default ToastProvider;
